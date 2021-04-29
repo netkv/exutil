@@ -2,9 +2,9 @@
 importas var 1
 backtick -E cont { pipeline { forbacktickx -E cmd { runblock -n 1 1 execlineb -c dollarat }
 	echo "\""${cmd}"\""
-} pipeline { tail -c +2 } head -c -2 }
-backtick -E contagain { pipeline { echo -n "${cont} \" \"" } tr "\n" " " }
-backtick -E uhh { forbacktickx -E cmd { pipeline { runblock -r 1 execlineb -c dollarat } sed "s/${var}/${contagain}/g" }
+} pipeline { tail -c +2 } pipeline { head -c -2 } tr "\n" " " }
+backtick -E contagain { echo -n "${cont} \" \"" }
+backtick -E uhh { forbacktickx -E cmd { pipeline { runblock -r 1 execlineb -c dollarat } python -c "(lambda s: s.stdout.write(s.stdin.read().replace(*s.argv[1:])))(__import__(\"sys\"))" ${var} ${contagain}  }
 	echo "\""${cmd}"\""
 }
 execlineb -c $uhh
