@@ -1,0 +1,7 @@
+#!/usr/bin/env execlineb
+fun :printcwd {
+	foreground { getcwd -E currentcwd echo ${currentcwd} }
+}
+foreground { echo let me print current cwd if true is true }
+if { true } :printcwd 
+	
