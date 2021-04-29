@@ -1,12 +1,10 @@
 #!/usr/bin/env execlineb
 importas var 1
-backtick -E cont { forbacktickx -E cmd { runblock -n 1 1 execlineb -c dollarat }
+backtick -E cont { pipeline { forbacktickx -E cmd { runblock -n 1 1 execlineb -c dollarat }
 	echo "\""${cmd}"\""
-}
-backtick -E contagain { pipeline { echo $cont } tr "\n" " " }
-backtick -E uhh { forbacktickx -E cmd { runblock -r 1 execlineb -c dollarat } 
-	ifelse { test ${cmd} = ${var} }
-	{ echo ${contagain} }
+} pipeline { tail -c +2 } head -c -2 }
+backtick -E contagain { pipeline { echo -n "${cont} \" \"" } tr "\n" " " }
+backtick -E uhh { forbacktickx -E cmd { pipeline { runblock -r 1 execlineb -c dollarat } sed "s/${var}/${contagain}/g" }
 	echo "\""${cmd}"\""
 }
 execlineb -c $uhh
