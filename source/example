@@ -1,0 +1,4 @@
+#!/usr/bin/env execlineb
+foreground { echo sourcing file... }
+./source file
+foreground { echo $is }

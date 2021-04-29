@@ -1,0 +1,9 @@
+#!/usr/bin/env execlineb
+importas 1 1 
+backtick -E cont { 
+	foreground { cat $1 }
+	forbacktickx -E cmd { shift -n 1 dollarat } 
+	
+	echo "\""${cmd}"\""
+}
+execlineb -c $cont

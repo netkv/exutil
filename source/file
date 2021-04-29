@@ -1,0 +1,3 @@
+#!/usr/bin/env execlineb
+define isnot "yes"
+backtick -E is { echo $isnot this is sourced }
