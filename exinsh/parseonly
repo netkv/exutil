@@ -1,0 +1,27 @@
+#!/bin/sh
+level=0
+run=$(echo $@ | tr "\n" " ")
+cmd=$(
+	for word in $run
+	do
+		if test $word = "{"
+		then
+			level=$(( level + 1 ))
+		elif test $word = "}"
+		then
+			end=$(
+				echo -n "\""
+				for num in $(seq $(( level - 1 )))
+				do
+					echo -n "x"
+				done
+				echo -n "\""
+			)	
+			echo -n "$end " | tr x " "
+			level=$(( level - 1 ))
+		else
+			echo -n "$word "
+		fi
+	done
+)
+eval $cmd

@@ -1,27 +1,108 @@
 #!/bin/sh
 level=0
-run=$(echo $@ | tr "\n" " ")
-cmd=$(
-	for word in $run
+num=0
+var=0
+run=$(cat $1 | tr "\n" " ")
+shift
+replace() {
+	input="$1"
+	lenght=${#input}
+	basedvar=$(
+		for num in $(seq $lenght)
+		do
+			echo -n $input | cut -c $num-$num | base32
+		done
+	)
+	input="$2"
+	lenght=${#input}
+	basedcont=$(
+		for num in $(seq $lenght)
+		do
+			echo -n $input | cut -c $num-$num | base32
+		done
+	)
+	shift
+	shift
+	input="$@"
+	lenght="$(echo $input | wc -c)"
+	basedinput=$(
+		for num in $(seq $lenght)
+		do
+			echo -n $input | cut -c $num-$num | base32
+		done
+	)
+	echo $basedinput | tr -d " " | sed "s/$(echo $basedvar | tr -d " ")/$(echo $basedcont | tr -d " ")/g" |  base32 -d | tr -d "\n"
+	
+}
+getblock() {
+	for word in $@
 	do
+		num=$(( num + 1 ))
 		if test $word = "{"
 		then
 			level=$(( level + 1 ))
 		elif test $word = "}"
 		then
-			end=$(
-				echo -n "\""
-				for num in $(seq $(( level - 1 )))
-				do
-					echo -n "x"
-				done
-				echo -n "\""
-			)	
-			echo -n "$end " | tr x " "
+			if test $level = 1
+			then
+				echo $num
+				break
+			fi
 			level=$(( level - 1 ))
-		else
-			echo -n "$word "
 		fi
 	done
-)
-eval $cmd
+	num=0
+}
+foreground() {
+	$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+	shift $(getblock $@)
+	eval $@
+	
+}
+background() {
+	$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 ))) &
+	shift $(getblock $@)
+	eval $@
+	
+}
+pipeline() {
+	$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 ))) | eval $(shift $(getblock $@); echo $@)
+}
+ifelse() {
+	$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+	if [ $? = 0 ]
+	then
+		shift $(getblock $@)
+		$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+	else
+		shift $(getblock $@)
+		shift $(getblock $@)
+		$@	
+	fi
+}
+ifthenelse() {
+	$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+	if [ $? = 0 ]
+	then
+		shift $(getblock $@)
+		$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+		shift $(getblock $@)
+	else
+		shift $(getblock $@)
+		shift $(getblock $@)
+		$(echo $@ |  cut -d " " -f2-$(( $(getblock $@) - 1 )))
+	fi
+	shift $(getblock $@)
+	$@
+}
+define() {
+	$(replace \$$@)
+}
+importas() {
+	varname=$1
+	varcont=$(printenv $2)
+	shift
+	shift
+	$(replace \$$varname $varcont $@)
+}
+$run

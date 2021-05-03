@@ -1,4 +1,7 @@
 # exinsh
 my attempt to implement execline in sh idk why
 
-for now it seems to parse "{" "}" properly so i think i can move to implementing functions 
+some functions are partially implemented but most is missing
+
+# parse only
+only convert "{" "}" for to zero lenght arg syntax

@@ -1,0 +1,6 @@
+define a b
+ifthenelse { test ay = var } {
+	echo $a
+} { echo no lmao }
+importas home HOME
+echo $home
